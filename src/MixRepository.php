@@ -1,29 +1,32 @@
 <?php
 
-namespace App\Service;
+namespace App\Controller;
 
-use Psr\Cache\CacheItemInterface;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Entity\VinylMix;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class MixRepository
+class MixController extends AbstractController
 {
-    private HttpClientInterface $httpClient;
-    private CacheInterface $cache;
-
-    public function __construct(HttpClientInterface $httpClient, CacheInterface $cache)
+    #[Route('/mix/new')]
+    public function new(EntityManagerInterface $entityManager): Response
     {
-        $this->httpClient = $httpClient;
-        $this->cache = $cache;
-    }
+        $mix = new VinylMix();
+        $mix->setTitle('Do you Remember... Phil Collins?!');
+        $mix->setDescription('A pure mix of drummers turned singers!');
+        $mix->setGenre('pop');
+        $mix->setTrackCount(rand(5, 20));
+        $mix->setVotes(rand(-50, 50));
 
-    public function findAll(): array
-    {
-        return $this->cache->get('mixes_data', function(CacheItemInterface $cacheItem) {
-            $cacheItem->expiresAfter(5);
-            $response = $this->httpClient->request('GET', 'https://raw.githubusercontent.com/SymfonyCasts/vinyl-mixes/main/mixes.json');
+        $entityManager->persist($mix);
+        $entityManager->flush();
 
-            return $response->toArray();
-        });
+        return new Response(sprintf(
+            'Mix %d is %d tracks of pure 80\'s heaven',
+            $mix->getId(),
+            $mix->getTrackCount()
+        ));
     }
 }

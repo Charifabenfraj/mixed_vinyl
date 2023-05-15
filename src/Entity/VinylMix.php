@@ -98,6 +98,21 @@ class VinylMix
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+<<<<<<< HEAD
+=======
+
+        return $this;
+    }
+
+    public function getVotes(): ?int
+    {
+        return $this->votes;
+    }
+
+    public function setVotes(int $votes): self
+    {
+        $this->votes = $votes;
+>>>>>>> 0b28922085d87e3706366450fa2b8c3e4a4f0ca8
 
         return $this;
     }
